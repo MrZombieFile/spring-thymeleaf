@@ -19,8 +19,11 @@ public class BranchOfficeServiceImpl implements BranchOfficeService {
 
     @Autowired
     private BranchOfficeRepository branchOfficeRepository;
+    //no es pot posar aquí el dto perque necessita cada una de les "branchOffice",
+    // llavors ho poso en cada mètode de la classe.
 
-    private BranchOfficeDTO convertDataIntoDTO(BranchOffice branchOffice){
+    @Override
+    public BranchOfficeDTO convertDataIntoDTO(BranchOffice branchOffice){
         BranchOfficeDTO dto = new BranchOfficeDTO(branchOffice.getPk_branchOfficeID(), branchOffice.getBranchOfficeName(), branchOffice.getBranchOfficeCountry());
         return dto;
     }

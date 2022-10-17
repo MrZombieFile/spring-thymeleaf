@@ -8,6 +8,7 @@ import java.util.List;
 
 public interface BranchOfficeService {
 
+    BranchOfficeDTO convertDataIntoDTO(BranchOffice branchOffice);
     List<BranchOfficeDTO> getAllBranchOffice();
     void saveBranchOffice(BranchOffice branchOffice);
     BranchOfficeDTO getBranchOfficeDTOById(Integer id);

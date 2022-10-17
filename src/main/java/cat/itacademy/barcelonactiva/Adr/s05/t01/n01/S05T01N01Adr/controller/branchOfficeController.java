@@ -10,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 public class branchOfficeController {
@@ -17,61 +18,26 @@ public class branchOfficeController {
     @Autowired
     private BranchOfficeServiceImpl branchOfficeService;
 
-    // display list of employees
-    //@GetMapping("/")
+
     @GetMapping({"/", "/getAll"})
     public String viewHomePage(Model model) {
         return findPaginated(1, "branchOfficeName", "asc", model);
     }
 
-    //@GetMapping("/showNewBranchOfficeForm")
     @GetMapping("/add")
     public String showNewBranchOfficeForm(Model model) {
         // create model attribute to bind form data
-        BranchOffice branchOffice = new BranchOffice();
+        BranchOfficeDTO branchOffice = branchOfficeService.convertDataIntoDTO(new BranchOffice());
         model.addAttribute("branchOffice", branchOffice);
         return "new_branchOffice";
     }
 
-    //@PostMapping("/saveBranchOffice")
     @PostMapping("/add")
     public String saveBranchOffice(@ModelAttribute("branchOffice") BranchOffice branchOffice) {
         // save employee to database
         branchOfficeService.saveBranchOffice(branchOffice);
         return "redirect:/getAll";
     }
-
-/*    //@GetMapping("/showFormForUpdate/{id}")
-    @GetMapping("/update{pk_branchOfficeID}")
-    public String getUpdate(@PathVariable( value = "pk_branchOfficeID") String pk_branchOfficeID, Model model) {
-        Integer integerID = 0;
-        try {
-            integerID = Integer.parseInt(pk_branchOfficeID);
-        }catch(Exception exc){
-            exc.getMessage();
-        }
-        // get employee from the service
-        BranchOfficeDTO branchOffice = branchOfficeService.getBranchOfficeDTOById(integerID);
-
-        // set employee as a model attribute to pre-populate the form
-        model.addAttribute("branchOffice", new BranchOffice(branchOffice.getBranchOfficeName(), branchOffice.getBranchOfficeCountry()));
-        return "update_branchOffice";
-    }
-
-    //@GetMapping("/showFormForUpdate/{id}")
-    @PostMapping("/update")
-    public String showFormForUpdate(@ModelAttribute("branchOffice") BranchOffice branchOffice, Model model) {
-
-        //Integer integerID = Integer.parseInt();
-        //branchOffice.setPk_branchOfficeID(integerID);
-        // get employee from the service
-        //BranchOfficeDTO branchOffice = branchOfficeService.getBranchOfficeDTOById(integerID);
-        branchOfficeService.updateByBranchOffice(branchOffice);
-        // set employee as a model attribute to pre-populate the form
-        //model.addAttribute("branchOffice", new BranchOffice(branchOffice.getBranchOfficeName(), branchOffice.getBranchOfficeCountry()));
-        return "update_branchOffice";
-    }
-*/
 
     @GetMapping("/update/{pk_branchOfficeID}")
     public String showFormForUpdate(@PathVariable ( value = "pk_branchOfficeID") Integer pk_branchOfficeID, @ModelAttribute("branchOffice") BranchOffice branchOffice, Model model) {
@@ -102,7 +68,9 @@ public class branchOfficeController {
         int pageSize = 5;
 
         Page<BranchOffice> page = branchOfficeService.findPaginated(pageNo, pageSize, sortField, sortDir);
-        List<BranchOffice> listBranchOffice = page.getContent();
+        //I switch results into dto
+        Page<BranchOfficeDTO> pageDto = page.map(x -> branchOfficeService.convertDataIntoDTO(x));
+        List<BranchOfficeDTO> listBranchOfficeDto = pageDto.getContent();
 
         model.addAttribute("currentPage", pageNo);
         model.addAttribute("totalPages", page.getTotalPages());
@@ -112,7 +80,7 @@ public class branchOfficeController {
         model.addAttribute("sortDir", sortDir);
         model.addAttribute("reverseSortDir", sortDir.equals("asc") ? "desc" : "asc");
 
-        model.addAttribute("listBranchOffice", listBranchOffice);
+        model.addAttribute("listBranchOffice", listBranchOfficeDto);
         return "index";
     }
 
